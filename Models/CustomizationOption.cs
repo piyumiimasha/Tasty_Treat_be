@@ -21,8 +21,7 @@ namespace Tasty_Treat_be.Models
         [MaxLength(50)]
         public string Type { get; set; } = string.Empty;
 
-        [Column("additional_price")]
-        [Column(TypeName = "decimal(10,2)")]
+        [Column("additional_price", TypeName = "decimal(10,2)")]
         public decimal AdditionalPrice { get; set; }
 
         [Column("updated_at")]

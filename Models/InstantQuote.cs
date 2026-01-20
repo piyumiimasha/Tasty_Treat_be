@@ -26,12 +26,10 @@ namespace Tasty_Treat_be.Models
         [Column(TypeName = "decimal(10,2)")]
         public decimal Discount { get; set; }
 
-        [Column("delivery_fee")]
-        [Column(TypeName = "decimal(10,2)")]
+        [Column("delivery_fee", TypeName = "decimal(10,2)")]
         public decimal DeliveryFee { get; set; }
 
-        [Column("estimated_price")]
-        [Column(TypeName = "decimal(10,2)")]
+        [Column("estimated_price", TypeName = "decimal(10,2)")]
         public decimal EstimatedPrice { get; set; }
 
         [Column("created_at")]

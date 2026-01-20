@@ -24,8 +24,7 @@ namespace Tasty_Treat_be.Models
         [Column("special_instructions")]
         public string? SpecialInstructions { get; set; }
 
-        [Column("total_amount")]
-        [Column(TypeName = "decimal(10,2)")]
+        [Column("total_amount", TypeName = "decimal(10,2)")]
         public decimal TotalAmount { get; set; }
 
         [Column("order_date")]

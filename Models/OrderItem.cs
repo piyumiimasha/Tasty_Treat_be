@@ -21,8 +21,7 @@ namespace Tasty_Treat_be.Models
 
         public int Quantity { get; set; }
 
-        [Column("order_item_price")]
-        [Column(TypeName = "decimal(10,2)")]
+        [Column("order_item_price", TypeName = "decimal(10,2)")]
         public decimal OrderItemPrice { get; set; }
 
         [Column("is_available")]
