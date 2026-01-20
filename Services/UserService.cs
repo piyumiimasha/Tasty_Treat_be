@@ -3,6 +3,7 @@ using Tasty_Treat_be.DTOs;
 using Tasty_Treat_be.Interfaces.Repository;
 using Tasty_Treat_be.Interfaces.Service;
 using Tasty_Treat_be.Models;
+using BCrypt.Net;
 
 namespace Tasty_Treat_be.Services
 {
@@ -44,6 +45,10 @@ namespace Tasty_Treat_be.Services
         public async Task<UserDto> CreateAsync(CreateUserDto createUserDto)
         {
             var user = _mapper.Map<User>(createUserDto);
+            
+            // Hash password before storing
+            user.Password = BCrypt.Net.BCrypt.HashPassword(createUserDto.Password);
+            
             var createdUser = await _userRepository.AddAsync(user);
             return _mapper.Map<UserDto>(createdUser);
         }
@@ -61,7 +66,7 @@ namespace Tasty_Treat_be.Services
             if (!string.IsNullOrEmpty(updateUserDto.Role))
                 user.Role = updateUserDto.Role;
             if (!string.IsNullOrEmpty(updateUserDto.Password))
-                user.Password = updateUserDto.Password;
+                user.Password = BCrypt.Net.BCrypt.HashPassword(updateUserDto.Password);
             if (updateUserDto.PhoneNo != null)
                 user.PhoneNo = updateUserDto.PhoneNo;
             if (updateUserDto.Address != null)
@@ -76,6 +81,11 @@ namespace Tasty_Treat_be.Services
         public async Task<bool> DeleteAsync(int id)
         {
             return await _userRepository.DeleteAsync(id);
+        }
+
+        public bool VerifyPassword(string password, string hashedPassword)
+        {
+            return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
         }
     }
 }

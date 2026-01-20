@@ -11,5 +11,6 @@ namespace Tasty_Treat_be.Interfaces.Service
         Task<UserDto> CreateAsync(CreateUserDto createUserDto);
         Task<UserDto> UpdateAsync(int id, UpdateUserDto updateUserDto);
         Task<bool> DeleteAsync(int id);
+        bool VerifyPassword(string password, string hashedPassword);
     }
 }
