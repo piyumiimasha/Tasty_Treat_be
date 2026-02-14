@@ -3,6 +3,8 @@ using System.Linq.Expressions;
 using Tasty_Treat_be.Data;
 using Tasty_Treat_be.Interfaces.Repository;
 
+// generic base class that provides common database operations for all models.
+//The <T> means it's generic - works with any model type.
 namespace Tasty_Treat_be.Repositories
 {
     public class Repository<T> : IRepository<T> where T : class

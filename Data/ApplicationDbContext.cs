@@ -1,3 +1,5 @@
+//defines the database context using Entity Framework Core (EF Core)
+
 using Microsoft.EntityFrameworkCore;
 using Tasty_Treat_be.Models;
 

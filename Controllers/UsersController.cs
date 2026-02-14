@@ -22,6 +22,7 @@ namespace Tasty_Treat_be.Controllers
             return Ok(users);
         }
 
+        //Action result is used to return HTTP responses with status codes and data
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDto>> GetById(int id)
         {
