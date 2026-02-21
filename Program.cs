@@ -7,6 +7,7 @@ using Tasty_Treat_be.Interfaces.Repository;
 using Tasty_Treat_be.Interfaces.Service;
 using Tasty_Treat_be.Repositories;
 using Tasty_Treat_be.Services;
+using Azure.Storage.Blobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,6 +45,10 @@ builder.Services.AddScoped<IDeliveryService, DeliveryService>();
 builder.Services.AddScoped<IInstantQuoteService, InstantQuoteService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+// Register Azure Blob Storage
+builder.Services.AddSingleton(x => new BlobServiceClient(builder.Configuration.GetConnectionString("AzureBlobStorage")));
+builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 
 // Configure CORS
 builder.Services.AddCors(options =>

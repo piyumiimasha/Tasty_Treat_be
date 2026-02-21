@@ -58,6 +58,20 @@ namespace Tasty_Treat_be.Services
                 item.BasePriceUnit = updateItemDto.BasePriceUnit;
             if (updateItemDto.Description != null)
                 item.Description = updateItemDto.Description;
+            if (updateItemDto.Flavour != null)
+                item.Flavour = updateItemDto.Flavour;
+
+            var updatedItem = await _itemRepository.UpdateAsync(item);
+            return _mapper.Map<ItemDto>(updatedItem);
+        }
+
+        public async Task<ItemDto> UpdateImageAsync(int id, string? imageUrl)
+        {
+            var item = await _itemRepository.GetByIdAsync(id);
+            if (item == null)
+                throw new KeyNotFoundException($"Item with id {id} not found");
+
+            item.ImageUrl = imageUrl;
 
             var updatedItem = await _itemRepository.UpdateAsync(item);
             return _mapper.Map<ItemDto>(updatedItem);

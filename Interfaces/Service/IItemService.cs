@@ -9,6 +9,7 @@ namespace Tasty_Treat_be.Interfaces.Service
         Task<IEnumerable<ItemDto>> GetByCategoryAsync(string category);
         Task<ItemDto> CreateAsync(CreateItemDto createItemDto);
         Task<ItemDto> UpdateAsync(int id, UpdateItemDto updateItemDto);
+        Task<ItemDto> UpdateImageAsync(int id, string? imageUrl);
         Task<bool> DeleteAsync(int id);
     }
 }

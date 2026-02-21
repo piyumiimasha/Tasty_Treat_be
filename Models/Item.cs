@@ -27,6 +27,13 @@ namespace Tasty_Treat_be.Models
 
         public string? Description { get; set; }
 
+        [MaxLength(100)]
+        public string? Flavour { get; set; }
+
+        [MaxLength(500)]
+        [Column("image_url")]
+        public string? ImageUrl { get; set; }
+
         // Navigation properties
         public virtual ICollection<CustomizationOption> CustomizationOptions { get; set; } = new List<CustomizationOption>();
         public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
