@@ -10,12 +10,15 @@ namespace Tasty_Treat_be.Controllers
     {
         private readonly IItemService _itemService;
         private readonly IBlobStorageService _blobStorageService;
-        private const string ItemImagesContainer = "item-images";
+        private readonly IConfiguration _configuration;
+        private readonly string _adminUploadsContainer;
 
-        public ItemsController(IItemService itemService, IBlobStorageService blobStorageService)
+        public ItemsController(IItemService itemService, IBlobStorageService blobStorageService, IConfiguration configuration)
         {
             _itemService = itemService;
             _blobStorageService = blobStorageService;
+            _configuration = configuration;
+            _adminUploadsContainer = _configuration["AzureBlobStorage:AdminUploadsContainer"] ?? "adminuploads";
         }
 
         [HttpGet]
@@ -49,7 +52,7 @@ namespace Tasty_Treat_be.Controllers
         /// <param name="image">Optional image file (jpg, png, gif, webp - max 5MB)</param>
         /// <returns>The created item with ImageUrl if image was uploaded</returns>
         [HttpPost]
-        public async Task<ActionResult<ItemDto>> Create([FromForm] CreateItemDto createItemDto, [FromForm] IFormFile? image)
+        public async Task<ActionResult<ItemDto>> Create([FromForm] CreateItemDto createItemDto, IFormFile? image)
         {
             try
             {
@@ -61,7 +64,7 @@ namespace Tasty_Treat_be.Controllers
                 {
                     try
                     {
-                        var imageUrl = await _blobStorageService.UploadImageAsync(image, ItemImagesContainer);
+                        var imageUrl = await _blobStorageService.UploadImageAsync(image, _adminUploadsContainer);
                         item = await _itemService.UpdateImageAsync(item.ItemId, imageUrl);
                     }
                     catch (ArgumentException ex)
@@ -88,7 +91,7 @@ namespace Tasty_Treat_be.Controllers
         /// <param name="image">Optional new image file (replaces existing image)</param>
         /// <returns>The updated item</returns>
         [HttpPut("{id}")]
-        public async Task<ActionResult<ItemDto>> Update(int id, [FromForm] UpdateItemDto updateItemDto, [FromForm] IFormFile? image)
+        public async Task<ActionResult<ItemDto>> Update(int id, [FromForm] UpdateItemDto updateItemDto, IFormFile? image)
         {
             try
             {
@@ -103,11 +106,11 @@ namespace Tasty_Treat_be.Controllers
                         // Delete old image if exists
                         if (!string.IsNullOrEmpty(item.ImageUrl))
                         {
-                            await _blobStorageService.DeleteImageAsync(item.ImageUrl, ItemImagesContainer);
+                            await _blobStorageService.DeleteImageAsync(item.ImageUrl, _adminUploadsContainer);
                         }
 
                         // Upload new image
-                        var imageUrl = await _blobStorageService.UploadImageAsync(image, ItemImagesContainer);
+                        var imageUrl = await _blobStorageService.UploadImageAsync(image, _adminUploadsContainer);
                         item = await _itemService.UpdateImageAsync(id, imageUrl);
                     }
                     catch (ArgumentException ex)
@@ -158,11 +161,11 @@ namespace Tasty_Treat_be.Controllers
                 // Delete old image if exists
                 if (!string.IsNullOrEmpty(item.ImageUrl))
                 {
-                    await _blobStorageService.DeleteImageAsync(item.ImageUrl, ItemImagesContainer);
+                    await _blobStorageService.DeleteImageAsync(item.ImageUrl, _adminUploadsContainer);
                 }
 
                 // Upload new image
-                var imageUrl = await _blobStorageService.UploadImageAsync(file, ItemImagesContainer);
+                var imageUrl = await _blobStorageService.UploadImageAsync(file, _adminUploadsContainer);
 
                 // Update item with new image URL
                 var updateDto = new UpdateItemDto { };
@@ -197,7 +200,7 @@ namespace Tasty_Treat_be.Controllers
                 }
 
                 // Delete image from blob storage
-                await _blobStorageService.DeleteImageAsync(item.ImageUrl, ItemImagesContainer);
+                await _blobStorageService.DeleteImageAsync(item.ImageUrl, _adminUploadsContainer);
 
                 // Update item to remove image URL
                 var updatedItem = await _itemService.UpdateImageAsync(id, null);
