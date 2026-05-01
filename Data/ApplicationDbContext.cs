@@ -15,6 +15,7 @@ namespace Tasty_Treat_be.Data
         public DbSet<ChatMsg> ChatMessages { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Item> Items { get; set; }
+        public DbSet<ItemFlavour> ItemFlavours { get; set; }
         public DbSet<CustomizationOption> CustomizationOptions { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Review> Reviews { get; set; }
@@ -83,6 +84,12 @@ namespace Tasty_Treat_be.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Configure Item relationships
+            modelBuilder.Entity<Item>()
+                .HasMany(i => i.ItemFlavours)
+                .WithOne(f => f.Item)
+                .HasForeignKey(f => f.ItemId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<Item>()
                 .HasMany(i => i.CustomizationOptions)
                 .WithOne(c => c.Item)
