@@ -32,6 +32,10 @@ namespace Tasty_Treat_be.Profiles
             CreateMap<UpdateItemDto, Item>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
+            // DesignRequest mappings
+            CreateMap<DesignRequest, DesignRequestDto>();
+            CreateMap<CreateDesignRequestDto, DesignRequest>();
+
             // ItemFlavour mappings
             CreateMap<ItemFlavour, ItemFlavourDto>();
             CreateMap<CreateItemFlavourDto, ItemFlavour>();
