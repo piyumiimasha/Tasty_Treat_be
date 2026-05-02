@@ -23,8 +23,15 @@ namespace Tasty_Treat_be.Models
         [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+        // nullable — null means "to admin"; set when admin replies to a specific user
+        [Column("recipient_id")]
+        public int? RecipientId { get; set; }
+
         // Navigation properties
         [ForeignKey("SenderId")]
         public virtual User? Sender { get; set; }
+
+        [ForeignKey("RecipientId")]
+        public virtual User? Recipient { get; set; }
     }
 }

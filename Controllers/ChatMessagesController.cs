@@ -46,6 +46,22 @@ namespace Tasty_Treat_be.Controllers
             return Ok(messages);
         }
 
+        // All messages between user {userId} and admin
+        [HttpGet("conversation/{userId}")]
+        public async Task<ActionResult<IEnumerable<ChatMsgDto>>> GetConversation(int userId)
+        {
+            var messages = await _chatMsgService.GetConversationAsync(userId);
+            return Ok(messages);
+        }
+
+        // Distinct customer list for admin sidebar
+        [HttpGet("conversation-users")]
+        public async Task<ActionResult<IEnumerable<ConversationUserDto>>> GetConversationUsers()
+        {
+            var users = await _chatMsgService.GetConversationUsersAsync();
+            return Ok(users);
+        }
+
         [HttpPost]
         public async Task<ActionResult<ChatMsgDto>> Create([FromBody] CreateChatMsgDto createChatMsgDto)
         {

@@ -8,6 +8,8 @@ namespace Tasty_Treat_be.Interfaces.Service
         Task<IEnumerable<ChatMsgDto>> GetAllAsync();
         Task<IEnumerable<ChatMsgDto>> GetBySenderIdAsync(int senderId);
         Task<IEnumerable<ChatMsgDto>> GetUnreadMessagesAsync();
+        Task<IEnumerable<ChatMsgDto>> GetConversationAsync(int userId);
+        Task<IEnumerable<ConversationUserDto>> GetConversationUsersAsync();
         Task<ChatMsgDto> CreateAsync(CreateChatMsgDto createChatMsgDto);
         Task<ChatMsgDto> UpdateAsync(int id, UpdateChatMsgDto updateChatMsgDto);
         Task<bool> DeleteAsync(int id);

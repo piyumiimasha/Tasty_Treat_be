@@ -35,6 +35,12 @@ namespace Tasty_Treat_be.Data
                 .HasForeignKey(m => m.SenderId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<ChatMsg>()
+                .HasOne(m => m.Recipient)
+                .WithMany()
+                .HasForeignKey(m => m.RecipientId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<User>()
                 .HasMany(u => u.Orders)
                 .WithOne(o => o.Customer)

@@ -14,9 +14,7 @@ namespace Tasty_Treat_be.Profiles
             CreateMap<UpdateUserDto, User>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
-            // ChatMsg mappings
-            CreateMap<ChatMsg, ChatMsgDto>();
-            CreateMap<CreateChatMsgDto, ChatMsg>();
+            // ChatMsg mappings — manual mapping used in service for SenderName
             CreateMap<UpdateChatMsgDto, ChatMsg>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
