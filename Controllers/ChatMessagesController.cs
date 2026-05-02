@@ -62,6 +62,13 @@ namespace Tasty_Treat_be.Controllers
             return Ok(users);
         }
 
+        [HttpPut("mark-read/{fromUserId}")]
+        public async Task<ActionResult> MarkRead(int fromUserId)
+        {
+            await _chatMsgService.MarkMessagesReadAsync(fromUserId);
+            return NoContent();
+        }
+
         [HttpPost]
         public async Task<ActionResult<ChatMsgDto>> Create([FromBody] CreateChatMsgDto createChatMsgDto)
         {

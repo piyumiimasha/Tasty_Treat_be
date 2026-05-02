@@ -13,5 +13,6 @@ namespace Tasty_Treat_be.Interfaces.Service
         Task<ChatMsgDto> CreateAsync(CreateChatMsgDto createChatMsgDto);
         Task<ChatMsgDto> UpdateAsync(int id, UpdateChatMsgDto updateChatMsgDto);
         Task<bool> DeleteAsync(int id);
+        Task MarkMessagesReadAsync(int fromUserId);
     }
 }

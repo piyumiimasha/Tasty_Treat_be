@@ -47,5 +47,14 @@ namespace Tasty_Treat_be.Repositories
                 .OrderBy(m => m.CreatedAt)
                 .ToListAsync();
         }
+
+        public async Task MarkMessagesReadAsync(int fromUserId)
+        {
+            var messages = await _dbSet
+                .Where(m => m.SenderId == fromUserId && m.RecipientId == null && !m.IsRead)
+                .ToListAsync();
+            foreach (var m in messages) m.IsRead = true;
+            await _context.SaveChangesAsync();
+        }
     }
 }

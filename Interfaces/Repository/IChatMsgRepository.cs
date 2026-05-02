@@ -8,5 +8,6 @@ namespace Tasty_Treat_be.Interfaces.Repository
         Task<IEnumerable<ChatMsg>> GetUnreadMessagesAsync();
         Task<IEnumerable<ChatMsg>> GetConversationAsync(int userId);
         Task<IEnumerable<ChatMsg>> GetAllWithSendersAsync();
+        Task MarkMessagesReadAsync(int fromUserId);
     }
 }

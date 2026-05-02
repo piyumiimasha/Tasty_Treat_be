@@ -113,6 +113,11 @@ namespace Tasty_Treat_be.Services
             return await _chatMsgRepository.DeleteAsync(id);
         }
 
+        public async Task MarkMessagesReadAsync(int fromUserId)
+        {
+            await _chatMsgRepository.MarkMessagesReadAsync(fromUserId);
+        }
+
         private static ChatMsgDto MapToDto(ChatMsg m) => new()
         {
             MsgId = m.MsgId,
