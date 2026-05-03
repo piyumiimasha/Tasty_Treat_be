@@ -40,8 +40,15 @@ namespace Tasty_Treat_be.Profiles
             CreateMap<UpdateItemFlavourDto, ItemFlavour>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
+            // CustomizationType mappings
+            CreateMap<CustomizationType, CustomizationTypeDto>();
+            CreateMap<CreateCustomizationTypeDto, CustomizationType>();
+            CreateMap<UpdateCustomizationTypeDto, CustomizationType>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
             // CustomizationOption mappings
-            CreateMap<CustomizationOption, CustomizationOptionDto>();
+            CreateMap<CustomizationOption, CustomizationOptionDto>()
+                .ForMember(d => d.TypeName, opt => opt.MapFrom(s => s.CustomizationType != null ? s.CustomizationType.Name : string.Empty));
             CreateMap<CreateCustomizationOptionDto, CustomizationOption>();
             CreateMap<UpdateCustomizationOptionDto, CustomizationOption>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));

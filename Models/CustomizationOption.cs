@@ -14,9 +14,11 @@ namespace Tasty_Treat_be.Models
         [MaxLength(100)]
         public string Name { get; set; } = string.Empty;
 
-        [Required]
-        [MaxLength(50)]
-        public string Type { get; set; } = string.Empty;
+        [Column("type_id")]
+        public int TypeId { get; set; }
+
+        [ForeignKey("TypeId")]
+        public virtual CustomizationType CustomizationType { get; set; } = null!;
 
         [Column("additional_price", TypeName = "decimal(10,2)")]
         public decimal AdditionalPrice { get; set; }

@@ -17,6 +17,7 @@ namespace Tasty_Treat_be.Data
         public DbSet<Item> Items { get; set; }
         public DbSet<ItemFlavour> ItemFlavours { get; set; }
         public DbSet<DesignRequest> DesignRequests { get; set; }
+        public DbSet<CustomizationType> CustomizationTypes { get; set; }
         public DbSet<CustomizationOption> CustomizationOptions { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Review> Reviews { get; set; }
@@ -110,7 +111,14 @@ namespace Tasty_Treat_be.Data
                 .HasForeignKey(r => r.ItemId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Configure CustomizationOption relationships
+            // Configure CustomizationType → CustomizationOption relationship
+            modelBuilder.Entity<CustomizationType>()
+                .HasMany(t => t.CustomizationOptions)
+                .WithOne(o => o.CustomizationType)
+                .HasForeignKey(o => o.TypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure CustomizationOption → OrderItem relationship
             modelBuilder.Entity<CustomizationOption>()
                 .HasMany(c => c.OrderItems)
                 .WithOne(oi => oi.CustomizationOption)

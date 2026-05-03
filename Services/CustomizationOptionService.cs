@@ -8,56 +8,59 @@ namespace Tasty_Treat_be.Services
 {
     public class CustomizationOptionService : ICustomizationOptionService
     {
-        private readonly ICustomizationOptionRepository _customizationOptionRepository;
+        private readonly ICustomizationOptionRepository _repo;
         private readonly IMapper _mapper;
 
-        public CustomizationOptionService(ICustomizationOptionRepository customizationOptionRepository, IMapper mapper)
+        public CustomizationOptionService(ICustomizationOptionRepository repo, IMapper mapper)
         {
-            _customizationOptionRepository = customizationOptionRepository;
+            _repo = repo;
             _mapper = mapper;
         }
 
         public async Task<CustomizationOptionDto?> GetByIdAsync(int id)
         {
-            var option = await _customizationOptionRepository.GetByIdAsync(id);
+            var option = await _repo.GetByIdAsync(id);
             return option != null ? _mapper.Map<CustomizationOptionDto>(option) : null;
         }
 
         public async Task<IEnumerable<CustomizationOptionDto>> GetAllAsync()
         {
-            var options = await _customizationOptionRepository.GetAllAsync();
+            var options = await _repo.GetAllAsync();
             return _mapper.Map<IEnumerable<CustomizationOptionDto>>(options);
         }
 
-        public async Task<CustomizationOptionDto> CreateAsync(CreateCustomizationOptionDto createCustomizationOptionDto)
+        public async Task<CustomizationOptionDto> CreateAsync(CreateCustomizationOptionDto dto)
         {
-            var option = _mapper.Map<CustomizationOption>(createCustomizationOptionDto);
-            var createdOption = await _customizationOptionRepository.AddAsync(option);
-            return _mapper.Map<CustomizationOptionDto>(createdOption);
+            var option = _mapper.Map<CustomizationOption>(dto);
+            var created = await _repo.AddAsync(option);
+            // Reload with type navigation to populate TypeName/TypeDisplayName
+            var withType = await _repo.GetByIdAsync(created.OptionId);
+            return _mapper.Map<CustomizationOptionDto>(withType!);
         }
 
-        public async Task<CustomizationOptionDto> UpdateAsync(int id, UpdateCustomizationOptionDto updateCustomizationOptionDto)
+        public async Task<CustomizationOptionDto> UpdateAsync(int id, UpdateCustomizationOptionDto dto)
         {
-            var option = await _customizationOptionRepository.GetByIdAsync(id);
+            var option = await _repo.GetByIdAsync(id);
             if (option == null)
                 throw new KeyNotFoundException($"CustomizationOption with id {id} not found");
 
-            if (!string.IsNullOrEmpty(updateCustomizationOptionDto.Name))
-                option.Name = updateCustomizationOptionDto.Name;
-            if (!string.IsNullOrEmpty(updateCustomizationOptionDto.Type))
-                option.Type = updateCustomizationOptionDto.Type;
-            if (updateCustomizationOptionDto.AdditionalPrice.HasValue)
-                option.AdditionalPrice = updateCustomizationOptionDto.AdditionalPrice.Value;
+            if (!string.IsNullOrEmpty(dto.Name))
+                option.Name = dto.Name;
+            if (dto.TypeId.HasValue)
+                option.TypeId = dto.TypeId.Value;
+            if (dto.AdditionalPrice.HasValue)
+                option.AdditionalPrice = dto.AdditionalPrice.Value;
 
             option.UpdatedAt = DateTime.UtcNow;
 
-            var updatedOption = await _customizationOptionRepository.UpdateAsync(option);
-            return _mapper.Map<CustomizationOptionDto>(updatedOption);
+            var updated = await _repo.UpdateAsync(option);
+            var withType = await _repo.GetByIdAsync(updated.OptionId);
+            return _mapper.Map<CustomizationOptionDto>(withType!);
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
-            return await _customizationOptionRepository.DeleteAsync(id);
+            return await _repo.DeleteAsync(id);
         }
     }
 }
