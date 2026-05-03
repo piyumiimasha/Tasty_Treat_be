@@ -29,12 +29,6 @@ namespace Tasty_Treat_be.Services
             return _mapper.Map<IEnumerable<CustomizationOptionDto>>(options);
         }
 
-        public async Task<IEnumerable<CustomizationOptionDto>> GetByItemIdAsync(int itemId)
-        {
-            var options = await _customizationOptionRepository.GetByItemIdAsync(itemId);
-            return _mapper.Map<IEnumerable<CustomizationOptionDto>>(options);
-        }
-
         public async Task<CustomizationOptionDto> CreateAsync(CreateCustomizationOptionDto createCustomizationOptionDto)
         {
             var option = _mapper.Map<CustomizationOption>(createCustomizationOptionDto);
@@ -48,8 +42,6 @@ namespace Tasty_Treat_be.Services
             if (option == null)
                 throw new KeyNotFoundException($"CustomizationOption with id {id} not found");
 
-            if (updateCustomizationOptionDto.ItemId.HasValue)
-                option.ItemId = updateCustomizationOptionDto.ItemId.Value;
             if (!string.IsNullOrEmpty(updateCustomizationOptionDto.Name))
                 option.Name = updateCustomizationOptionDto.Name;
             if (!string.IsNullOrEmpty(updateCustomizationOptionDto.Type))

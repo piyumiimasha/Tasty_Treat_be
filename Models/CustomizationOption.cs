@@ -10,9 +10,6 @@ namespace Tasty_Treat_be.Models
         [Column("option_id")]
         public int OptionId { get; set; }
 
-        [Column("item_id")]
-        public int ItemId { get; set; }
-
         [Required]
         [MaxLength(100)]
         public string Name { get; set; } = string.Empty;
@@ -27,9 +24,6 @@ namespace Tasty_Treat_be.Models
         [Column("updated_at")]
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-        // Navigation properties
-        [ForeignKey("ItemId")]
-        public virtual Item? Item { get; set; }
         public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }
 }

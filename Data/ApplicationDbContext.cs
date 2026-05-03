@@ -97,11 +97,6 @@ namespace Tasty_Treat_be.Data
                 .HasForeignKey(f => f.ItemId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Item>()
-                .HasMany(i => i.CustomizationOptions)
-                .WithOne(c => c.Item)
-                .HasForeignKey(c => c.ItemId)
-                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Item>()
                 .HasMany(i => i.OrderItems)

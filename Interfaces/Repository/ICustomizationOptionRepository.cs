@@ -4,6 +4,5 @@ namespace Tasty_Treat_be.Interfaces.Repository
 {
     public interface ICustomizationOptionRepository : IRepository<CustomizationOption>
     {
-        Task<IEnumerable<CustomizationOption>> GetByItemIdAsync(int itemId);
     }
 }

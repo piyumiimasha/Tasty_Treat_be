@@ -35,7 +35,6 @@ namespace Tasty_Treat_be.Models
         public string? ImageUrl { get; set; }
 
         // Navigation properties
-        public virtual ICollection<CustomizationOption> CustomizationOptions { get; set; } = new List<CustomizationOption>();
         public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
         public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
         public virtual ICollection<ItemFlavour> ItemFlavours { get; set; } = new List<ItemFlavour>();

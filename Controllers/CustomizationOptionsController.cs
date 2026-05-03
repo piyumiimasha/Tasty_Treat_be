@@ -32,13 +32,6 @@ namespace Tasty_Treat_be.Controllers
             return Ok(option);
         }
 
-        [HttpGet("item/{itemId}")]
-        public async Task<ActionResult<IEnumerable<CustomizationOptionDto>>> GetByItemId(int itemId)
-        {
-            var options = await _customizationOptionService.GetByItemIdAsync(itemId);
-            return Ok(options);
-        }
-
         [HttpPost]
         public async Task<ActionResult<CustomizationOptionDto>> Create([FromBody] CreateCustomizationOptionDto createCustomizationOptionDto)
         {
