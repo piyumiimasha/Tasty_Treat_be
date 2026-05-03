@@ -19,7 +19,7 @@ namespace Tasty_Treat_be.Controllers
         {
             _service = service;
             _blobStorageService = blobStorageService;
-            _container = configuration["AzureBlobStorage:AdminUploadsContainer"] ?? "adminuploads";
+            _container = configuration["AzureBlobStorage:DesignRequestsContainer"] ?? "designerrequests";
         }
 
         [HttpGet]
