@@ -14,6 +14,7 @@ namespace Tasty_Treat_be.DTOs
     {
         public string CustomerName { get; set; } = string.Empty;
         public string? Message { get; set; }
+        public string? ImageUrl { get; set; }
     }
 
     public class UpdateDesignRequestDto

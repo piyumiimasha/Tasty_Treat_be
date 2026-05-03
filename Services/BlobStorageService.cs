@@ -79,6 +79,33 @@ namespace Tasty_Treat_be.Services
             }
         }
 
+        public async Task<string> UploadFromStreamAsync(Stream stream, string fileName, string contentType, string containerName)
+        {
+            try
+            {
+                var extension = Path.GetExtension(fileName).ToLowerInvariant();
+                if (string.IsNullOrEmpty(extension)) extension = ".jpg";
+
+                var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
+                await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
+
+                var blobName = $"{Guid.NewGuid()}{extension}";
+                var blobClient = containerClient.GetBlobClient(blobName);
+
+                var blobHttpHeaders = new BlobHttpHeaders { ContentType = contentType };
+
+                await blobClient.UploadAsync(stream, new BlobUploadOptions { HttpHeaders = blobHttpHeaders });
+
+                _logger.LogInformation($"Successfully uploaded stream: {blobName} to container: {containerName}");
+                return blobClient.Uri.ToString();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error uploading stream: {ex.Message}");
+                throw;
+            }
+        }
+
         public async Task<bool> DeleteImageAsync(string imageUrl, string containerName)
         {
             try

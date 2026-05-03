@@ -54,6 +54,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Register Azure Blob Storage
 builder.Services.AddSingleton(x => new BlobServiceClient(builder.Configuration.GetConnectionString("AzureBlobStorage")));
+builder.Services.AddHttpClient();
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 
 // Configure CORS

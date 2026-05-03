@@ -46,7 +46,11 @@ namespace Tasty_Treat_be.Controllers
             {
                 var request = await _service.CreateAsync(dto);
 
-                if (image != null && image.Length > 0)
+                if (!string.IsNullOrEmpty(dto.ImageUrl))
+                {
+                    request = await _service.UpdateImageAsync(request.DesignRequestId, dto.ImageUrl);
+                }
+                else if (image != null && image.Length > 0)
                 {
                     try
                     {
