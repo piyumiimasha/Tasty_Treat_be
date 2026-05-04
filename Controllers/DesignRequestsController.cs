@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Tasty_Treat_be.DTOs;
 using Tasty_Treat_be.Interfaces.Service;
@@ -44,6 +45,10 @@ namespace Tasty_Treat_be.Controllers
         {
             try
             {
+                // Prefer JWT claim over form-submitted value
+                var claim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (int.TryParse(claim, out var claimId)) dto.CustomerId = claimId;
+
                 var request = await _service.CreateAsync(dto);
 
                 if (!string.IsNullOrEmpty(dto.ImageUrl))
@@ -80,7 +85,7 @@ namespace Tasty_Treat_be.Controllers
                 if (string.IsNullOrEmpty(dto.Status))
                     return BadRequest("Status is required");
 
-                var request = await _service.UpdateStatusAsync(id, dto.Status);
+                var request = await _service.UpdateStatusAsync(id, dto.Status, dto.QuotedPrice);
                 return Ok(request);
             }
             catch (KeyNotFoundException ex)

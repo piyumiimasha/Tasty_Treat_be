@@ -15,6 +15,9 @@ namespace Tasty_Treat_be.Models
         [Column("customer_name")]
         public string CustomerName { get; set; } = string.Empty;
 
+        [Column("customer_id")]
+        public int? CustomerId { get; set; }
+
         [Column("message")]
         public string? Message { get; set; }
 
@@ -25,6 +28,9 @@ namespace Tasty_Treat_be.Models
         [Required]
         [MaxLength(20)]
         public string Status { get; set; } = "pending";
+
+        [Column("quoted_price", TypeName = "decimal(10,2)")]
+        public decimal? QuotedPrice { get; set; }
 
         [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
