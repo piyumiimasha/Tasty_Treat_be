@@ -14,6 +14,9 @@ namespace Tasty_Treat_be.Models
         [MaxLength(100)]
         public string Name { get; set; } = string.Empty;
 
+        [Column("is_multi_select")]
+        public bool IsMultiSelect { get; set; } = false;
+
         public virtual ICollection<CustomizationOption> CustomizationOptions { get; set; } = new List<CustomizationOption>();
     }
 }

@@ -44,6 +44,8 @@ namespace Tasty_Treat_be.Services
 
             if (!string.IsNullOrEmpty(dto.Name))
                 type.Name = dto.Name;
+            if (dto.IsMultiSelect.HasValue)
+                type.IsMultiSelect = dto.IsMultiSelect.Value;
 
             var updated = await _repo.UpdateAsync(type);
             return _mapper.Map<CustomizationTypeDto>(updated);
