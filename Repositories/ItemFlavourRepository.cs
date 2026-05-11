@@ -15,5 +15,15 @@ namespace Tasty_Treat_be.Repositories
         {
             return await _dbSet.Where(f => f.ItemId == itemId).ToListAsync();
         }
+
+        public async Task<IEnumerable<string>> GetDistinctNamesAsync()
+        {
+            return await _context.Set<Item>()
+                .Where(i => i.Flavour != null)
+                .Select(i => i.Flavour!)
+                .Distinct()
+                .OrderBy(n => n)
+                .ToListAsync();
+        }
     }
 }

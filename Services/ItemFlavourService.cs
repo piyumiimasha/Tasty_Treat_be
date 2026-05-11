@@ -65,5 +65,10 @@ namespace Tasty_Treat_be.Services
         {
             return await _repo.DeleteAsync(id);
         }
+
+        public async Task<IEnumerable<string>> GetDistinctNamesAsync()
+        {
+            return await _repo.GetDistinctNamesAsync();
+        }
     }
 }

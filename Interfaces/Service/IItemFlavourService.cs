@@ -9,5 +9,6 @@ namespace Tasty_Treat_be.Interfaces.Service
         Task<ItemFlavourDto> CreateAsync(int itemId, CreateItemFlavourDto dto);
         Task<ItemFlavourDto> UpdateAsync(int id, UpdateItemFlavourDto dto);
         Task<bool> DeleteAsync(int id);
+        Task<IEnumerable<string>> GetDistinctNamesAsync();
     }
 }

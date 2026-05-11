@@ -53,6 +53,8 @@ namespace Tasty_Treat_be.Services
                 item.Name = updateItemDto.Name;
             if (updateItemDto.CategoryId.HasValue)
                 item.CategoryId = updateItemDto.CategoryId.Value;
+            if (!string.IsNullOrWhiteSpace(updateItemDto.Flavour))
+                item.Flavour = updateItemDto.Flavour;
             if (updateItemDto.BasePrice.HasValue)
                 item.BasePrice = updateItemDto.BasePrice.Value;
             if (updateItemDto.BasePriceUnit != null)
