@@ -38,6 +38,7 @@ namespace Tasty_Treat_be.Services
         public async Task<ItemDto> CreateAsync(CreateItemDto createItemDto)
         {
             var item = _mapper.Map<Item>(createItemDto);
+            item.CategoryId = createItemDto.CategoryId;
             var createdItem = await _itemRepository.AddAsync(item);
             return _mapper.Map<ItemDto>(createdItem);
         }
@@ -50,8 +51,8 @@ namespace Tasty_Treat_be.Services
 
             if (!string.IsNullOrEmpty(updateItemDto.Name))
                 item.Name = updateItemDto.Name;
-            if (!string.IsNullOrEmpty(updateItemDto.Category))
-                item.Category = updateItemDto.Category;
+            if (updateItemDto.CategoryId.HasValue)
+                item.CategoryId = updateItemDto.CategoryId.Value;
             if (updateItemDto.BasePrice.HasValue)
                 item.BasePrice = updateItemDto.BasePrice.Value;
             if (updateItemDto.BasePriceUnit != null)

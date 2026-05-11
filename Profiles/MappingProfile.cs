@@ -25,7 +25,8 @@ namespace Tasty_Treat_be.Profiles
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
             // Item mappings
-            CreateMap<Item, ItemDto>();
+            CreateMap<Item, ItemDto>()
+                .ForMember(d => d.Category, opt => opt.MapFrom(s => s.CategoryNav != null ? s.CategoryNav.Name : string.Empty));
             CreateMap<CreateItemDto, Item>();
             CreateMap<UpdateItemDto, Item>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));

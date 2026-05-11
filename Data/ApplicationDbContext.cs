@@ -154,8 +154,6 @@ namespace Tasty_Treat_be.Data
             modelBuilder.Entity<Order>()
                 .HasIndex(o => o.Status);
 
-            modelBuilder.Entity<Item>()
-                .HasIndex(i => i.Category);
         }
     }
 }

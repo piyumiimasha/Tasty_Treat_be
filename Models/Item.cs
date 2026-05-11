@@ -14,10 +14,6 @@ namespace Tasty_Treat_be.Models
         [MaxLength(100)]
         public string Name { get; set; } = string.Empty;
 
-        [Required]
-        [MaxLength(50)]
-        public string Category { get; set; } = string.Empty;
-
         [Column("base_price", TypeName = "decimal(10,2)")]
         public decimal BasePrice { get; set; }
 
