@@ -15,6 +15,7 @@ namespace Tasty_Treat_be.Data
         public DbSet<ChatMsg> ChatMessages { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Item> Items { get; set; }
+        public DbSet<Category> Categories { get; set; }
         public DbSet<ItemFlavour> ItemFlavours { get; set; }
         public DbSet<DesignRequest> DesignRequests { get; set; }
         public DbSet<CustomizationType> CustomizationTypes { get; set; }
@@ -92,6 +93,12 @@ namespace Tasty_Treat_be.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Configure Item relationships
+            modelBuilder.Entity<Item>()
+                .HasOne(i => i.CategoryNav)
+                .WithMany()
+                .HasForeignKey(i => i.CategoryId)
+                .OnDelete(DeleteBehavior.SetNull);
+
             modelBuilder.Entity<Item>()
                 .HasMany(i => i.ItemFlavours)
                 .WithOne(f => f.Item)

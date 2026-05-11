@@ -34,7 +34,11 @@ namespace Tasty_Treat_be.Models
         [Column("image_url")]
         public string? ImageUrl { get; set; }
 
+        [Column("category_id")]
+        public int? CategoryId { get; set; }
+
         // Navigation properties
+        public virtual Category? CategoryNav { get; set; }
         public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
         public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
         public virtual ICollection<ItemFlavour> ItemFlavours { get; set; } = new List<ItemFlavour>();
