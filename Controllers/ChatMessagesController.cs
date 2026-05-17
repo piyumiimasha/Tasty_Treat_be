@@ -62,10 +62,33 @@ namespace Tasty_Treat_be.Controllers
             return Ok(users);
         }
 
+        // Users who have sent direct messages to userId (shows in customer's sidebar)
+        [HttpGet("direct-partners/{userId}")]
+        public async Task<ActionResult<IEnumerable<ConversationUserDto>>> GetDirectPartners(int userId)
+        {
+            var partners = await _chatMsgService.GetDirectPartnersAsync(userId);
+            return Ok(partners);
+        }
+
+        // Direct messages between two specific users (e.g. delivery person ↔ customer)
+        [HttpGet("direct/{user1Id}/{user2Id}")]
+        public async Task<ActionResult<IEnumerable<ChatMsgDto>>> GetDirectConversation(int user1Id, int user2Id)
+        {
+            var messages = await _chatMsgService.GetDirectConversationAsync(user1Id, user2Id);
+            return Ok(messages);
+        }
+
         [HttpPut("mark-read/{fromUserId}")]
         public async Task<ActionResult> MarkRead(int fromUserId)
         {
             await _chatMsgService.MarkMessagesReadAsync(fromUserId);
+            return NoContent();
+        }
+
+        [HttpPut("direct-mark-read/{fromUserId}/{toUserId}")]
+        public async Task<ActionResult> MarkDirectRead(int fromUserId, int toUserId)
+        {
+            await _chatMsgService.MarkDirectMessagesReadAsync(fromUserId, toUserId);
             return NoContent();
         }
 

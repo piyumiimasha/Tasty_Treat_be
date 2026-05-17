@@ -105,11 +105,11 @@ namespace Tasty_Treat_be.Services
             }
             else
             {
-                // Admin → Customer: notify the specific customer
+                // Admin/Delivery → specific user: notify them with sender name
                 await _notificationService.NotifyUserAsync(
                     createChatMsgDto.RecipientId.Value,
                     "SupportMessage",
-                    $"TastyTreat Replied: \"{TruncateMessage(dto.MsgTxt)}\"",
+                    $"{dto.SenderName}: \"{TruncateMessage(dto.MsgTxt)}\"",
                     dto.SenderId);
             }
 
@@ -142,6 +142,40 @@ namespace Tasty_Treat_be.Services
         public async Task MarkMessagesReadAsync(int fromUserId)
         {
             await _chatMsgRepository.MarkMessagesReadAsync(fromUserId);
+        }
+
+        public async Task MarkDirectMessagesReadAsync(int fromUserId, int toUserId)
+        {
+            await _chatMsgRepository.MarkDirectMessagesReadAsync(fromUserId, toUserId);
+        }
+
+        public async Task<IEnumerable<ChatMsgDto>> GetDirectConversationAsync(int user1Id, int user2Id)
+        {
+            var messages = await _chatMsgRepository.GetDirectMessagesAsync(user1Id, user2Id);
+            return messages.Select(MapToDto);
+        }
+
+        public async Task<IEnumerable<ConversationUserDto>> GetDirectPartnersAsync(int userId)
+        {
+            var received = await _chatMsgRepository.GetDirectMessagesReceivedAsync(userId);
+
+            return received
+                .Where(m => m.Sender?.Role == "DeliveryPerson")
+                .GroupBy(m => m.SenderId)
+                .Select(g =>
+                {
+                    var last = g.OrderByDescending(m => m.CreatedAt).First();
+                    return new ConversationUserDto
+                    {
+                        UserId = g.Key,
+                        Name = last.Sender?.Name ?? "Unknown",
+                        LastMessage = last.MsgTxt,
+                        LastMessageAt = last.CreatedAt,
+                        UnreadCount = g.Count(m => !m.IsRead),
+                    };
+                })
+                .OrderByDescending(u => u.LastMessageAt)
+                .ToList();
         }
 
         private static ChatMsgDto MapToDto(ChatMsg m) => new()

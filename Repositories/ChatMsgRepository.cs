@@ -29,13 +29,15 @@ namespace Tasty_Treat_be.Repositories
                 .ToListAsync();
         }
 
-        // All messages in a user's conversation with admin:
-        // messages sent BY the user, OR admin replies TO the user
+        // Admin↔user support conversation:
+        // only messages the user sent TO admin (recipientId == null), plus admin replies back to the user
         public async Task<IEnumerable<ChatMsg>> GetConversationAsync(int userId)
         {
             return await _dbSet
                 .Include(m => m.Sender)
-                .Where(m => m.SenderId == userId || m.RecipientId == userId)
+                .Where(m =>
+                    (m.SenderId == userId && m.RecipientId == null) ||
+                    (m.RecipientId == userId && (m.Sender == null || m.Sender.Role != "DeliveryPerson")))
                 .OrderBy(m => m.CreatedAt)
                 .ToListAsync();
         }
@@ -46,6 +48,36 @@ namespace Tasty_Treat_be.Repositories
                 .Include(m => m.Sender)
                 .OrderBy(m => m.CreatedAt)
                 .ToListAsync();
+        }
+
+        // All messages sent directly TO userId (non-admin channel, i.e. recipientId == userId)
+        public async Task<IEnumerable<ChatMsg>> GetDirectMessagesReceivedAsync(int userId)
+        {
+            return await _dbSet
+                .Include(m => m.Sender)
+                .Where(m => m.RecipientId == userId && m.Sender != null)
+                .OrderBy(m => m.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<ChatMsg>> GetDirectMessagesAsync(int user1Id, int user2Id)
+        {
+            return await _dbSet
+                .Include(m => m.Sender)
+                .Where(m =>
+                    (m.SenderId == user1Id && m.RecipientId == user2Id) ||
+                    (m.SenderId == user2Id && m.RecipientId == user1Id))
+                .OrderBy(m => m.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task MarkDirectMessagesReadAsync(int fromUserId, int toUserId)
+        {
+            var messages = await _dbSet
+                .Where(m => m.SenderId == fromUserId && m.RecipientId == toUserId && !m.IsRead)
+                .ToListAsync();
+            foreach (var m in messages) m.IsRead = true;
+            await _context.SaveChangesAsync();
         }
 
         public async Task MarkMessagesReadAsync(int fromUserId)
