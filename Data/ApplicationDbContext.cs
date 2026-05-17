@@ -25,6 +25,7 @@ namespace Tasty_Treat_be.Data
         public DbSet<Delivery> Deliveries { get; set; }
         public DbSet<InstantQuote> InstantQuotes { get; set; }
         public DbSet<Payment> Payments { get; set; }
+        public DbSet<AppSetting> AppSettings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
