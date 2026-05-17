@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Azure.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -68,8 +69,12 @@ builder.Services.AddSingleton(x => new BlobServiceClient(builder.Configuration.G
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 
-// Add SignalR
-builder.Services.AddSignalR();
+// Add SignalR — uses Azure SignalR Service when connection string is present, built-in otherwise
+var azureSignalRConnection = builder.Configuration["Azure:SignalR:ConnectionString"];
+if (!string.IsNullOrEmpty(azureSignalRConnection))
+    builder.Services.AddSignalR().AddAzureSignalR(azureSignalRConnection);
+else
+    builder.Services.AddSignalR();
 
 // Configure CORS
 builder.Services.AddCors(options =>
