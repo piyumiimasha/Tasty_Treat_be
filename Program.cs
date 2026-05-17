@@ -16,7 +16,11 @@ builder.Services.AddControllers();
 
 // Configure Entity Framework Core with SQL Server
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlOptions => sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(10),
+            errorNumbersToAdd: null)));
 
 // Register AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));
@@ -65,7 +69,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll",
         policy =>
         {
-            policy.AllowAnyOrigin()
+            var allowedOrigin = builder.Configuration["AllowedCorsOrigin"] ?? "http://localhost:3000";
+            policy.WithOrigins(allowedOrigin)
                   .AllowAnyMethod()
                   .AllowAnyHeader();
         });
@@ -99,9 +104,9 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
-
 app.UseCors("AllowAll");
+
+app.UseHttpsRedirection();
 
 app.UseAuthentication();
 
