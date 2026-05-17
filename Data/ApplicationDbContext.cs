@@ -26,6 +26,7 @@ namespace Tasty_Treat_be.Data
         public DbSet<InstantQuote> InstantQuotes { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<AppSetting> AppSettings { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -154,6 +155,16 @@ namespace Tasty_Treat_be.Data
 
             modelBuilder.Entity<Order>()
                 .HasIndex(o => o.Status);
+
+            // Notification relationships and indexes
+            modelBuilder.Entity<Notification>()
+                .HasOne(n => n.User)
+                .WithMany()
+                .HasForeignKey(n => n.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Notification>()
+                .HasIndex(n => new { n.UserId, n.IsRead });
 
         }
     }

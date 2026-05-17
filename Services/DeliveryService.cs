@@ -9,12 +9,20 @@ namespace Tasty_Treat_be.Services
     public class DeliveryService : IDeliveryService
     {
         private readonly IDeliveryRepository _deliveryRepository;
+        private readonly IOrderRepository _orderRepository;
         private readonly IMapper _mapper;
+        private readonly INotificationService _notificationService;
 
-        public DeliveryService(IDeliveryRepository deliveryRepository, IMapper mapper)
+        public DeliveryService(
+            IDeliveryRepository deliveryRepository,
+            IOrderRepository orderRepository,
+            IMapper mapper,
+            INotificationService notificationService)
         {
             _deliveryRepository = deliveryRepository;
+            _orderRepository = orderRepository;
             _mapper = mapper;
+            _notificationService = notificationService;
         }
 
         public async Task<DeliveryDto?> GetByIdAsync(int id)
@@ -46,6 +54,13 @@ namespace Tasty_Treat_be.Services
             var delivery = _mapper.Map<Delivery>(createDeliveryDto);
             delivery.AssignedAt = DateTime.UtcNow;
             var createdDelivery = await _deliveryRepository.AddAsync(delivery);
+
+            await _notificationService.NotifyUserAsync(
+                createdDelivery.DeliveryPersonId,
+                "DeliveryUpdate",
+                $"You have been assigned delivery for Order #{createdDelivery.OrderId}",
+                createdDelivery.OrderId);
+
             return _mapper.Map<DeliveryDto>(createdDelivery);
         }
 
@@ -54,6 +69,8 @@ namespace Tasty_Treat_be.Services
             var delivery = await _deliveryRepository.GetByIdAsync(id);
             if (delivery == null)
                 throw new KeyNotFoundException($"Delivery with id {id} not found");
+
+            var oldStatus = delivery.DeliveryStatus;
 
             if (updateDeliveryDto.DeliveryPersonId.HasValue)
                 delivery.DeliveryPersonId = updateDeliveryDto.DeliveryPersonId.Value;
@@ -69,6 +86,29 @@ namespace Tasty_Treat_be.Services
                 delivery.DeliveredAt = updateDeliveryDto.DeliveredAt.Value;
 
             var updatedDelivery = await _deliveryRepository.UpdateAsync(delivery);
+
+            if (!string.IsNullOrEmpty(updateDeliveryDto.DeliveryStatus) && updateDeliveryDto.DeliveryStatus != oldStatus)
+            {
+                await _notificationService.NotifyUserAsync(
+                    updatedDelivery.DeliveryPersonId,
+                    "DeliveryUpdate",
+                    $"Delivery status for Order #{updatedDelivery.OrderId} updated to: {updatedDelivery.DeliveryStatus}",
+                    updatedDelivery.OrderId);
+
+                if (updateDeliveryDto.DeliveryStatus == "Delivered")
+                {
+                    var order = await _orderRepository.GetByIdAsync(updatedDelivery.OrderId);
+                    if (order != null)
+                    {
+                        await _notificationService.NotifyUserAsync(
+                            order.CustomerId,
+                            "DeliveryUpdate",
+                            $"Your order #{order.OrderId} has been delivered!",
+                            order.OrderId);
+                    }
+                }
+            }
+
             return _mapper.Map<DeliveryDto>(updatedDelivery);
         }
 

@@ -3,7 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Tasty_Treat_be.Data;
-using Tasty_Treat_be.Interfaces.Repository; 
+using Tasty_Treat_be.Hubs;
+using Tasty_Treat_be.Interfaces.Repository;
 using Tasty_Treat_be.Interfaces.Service;
 using Tasty_Treat_be.Repositories;
 using Tasty_Treat_be.Services;
@@ -58,10 +59,17 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 
+// Register Notification repository and service
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+
 // Register Azure Blob Storage
 builder.Services.AddSingleton(x => new BlobServiceClient(builder.Configuration.GetConnectionString("AzureBlobStorage")));
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
+
+// Add SignalR
+builder.Services.AddSignalR();
 
 // Configure CORS
 builder.Services.AddCors(options =>
@@ -72,7 +80,8 @@ builder.Services.AddCors(options =>
             var allowedOrigin = builder.Configuration["AllowedCorsOrigin"] ?? "http://localhost:3000";
             policy.WithOrigins(allowedOrigin)
                   .AllowAnyMethod()
-                  .AllowAnyHeader();
+                  .AllowAnyHeader()
+                  .AllowCredentials();
         });
 });
 
@@ -90,6 +99,22 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidAudience = builder.Configuration["JwtSettings:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]!))
+        };
+
+        // Allow SignalR to read the JWT token from the query string
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) &&
+                    path.StartsWithSegments("/hubs/notifications"))
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+            }
         };
     });
 
@@ -113,5 +138,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<NotificationHub>("/hubs/notifications");
 
 app.Run();

@@ -78,6 +78,9 @@ namespace Tasty_Treat_be.Profiles
             CreateMap<UpdateInstantQuoteDto, InstantQuote>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
+            // Notification mappings
+            CreateMap<Notification, NotificationDto>();
+
             // Payment mappings
             CreateMap<Payment, PaymentDto>();
             CreateMap<CreatePaymentDto, Payment>();

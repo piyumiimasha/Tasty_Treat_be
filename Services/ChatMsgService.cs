@@ -10,11 +10,13 @@ namespace Tasty_Treat_be.Services
     {
         private readonly IChatMsgRepository _chatMsgRepository;
         private readonly IMapper _mapper;
+        private readonly INotificationService _notificationService;
 
-        public ChatMsgService(IChatMsgRepository chatMsgRepository, IMapper mapper)
+        public ChatMsgService(IChatMsgRepository chatMsgRepository, IMapper mapper, INotificationService notificationService)
         {
             _chatMsgRepository = chatMsgRepository;
             _mapper = mapper;
+            _notificationService = notificationService;
         }
 
         public async Task<ChatMsgDto?> GetByIdAsync(int id)
@@ -90,8 +92,32 @@ namespace Tasty_Treat_be.Services
             // Re-fetch with Sender navigation loaded so SenderName is populated
             var messages = await _chatMsgRepository.GetConversationAsync(createChatMsgDto.SenderId);
             var withSender = messages.FirstOrDefault(m => m.MsgId == created.MsgId);
-            return MapToDto(withSender ?? created);
+            var dto = MapToDto(withSender ?? created);
+
+            if (createChatMsgDto.RecipientId == null)
+            {
+                // Customer → Admin: notify all admins
+                await _notificationService.NotifyRoleAsync(
+                    "Admin",
+                    "SupportMessage",
+                    $"New support message from {dto.SenderName}: \"{TruncateMessage(dto.MsgTxt)}\"",
+                    dto.SenderId);
+            }
+            else
+            {
+                // Admin → Customer: notify the specific customer
+                await _notificationService.NotifyUserAsync(
+                    createChatMsgDto.RecipientId.Value,
+                    "SupportMessage",
+                    $"TastyTreat Replied: \"{TruncateMessage(dto.MsgTxt)}\"",
+                    dto.SenderId);
+            }
+
+            return dto;
         }
+
+        private static string TruncateMessage(string text, int maxLength = 60) =>
+            text.Length <= maxLength ? text : text[..maxLength] + "…";
 
         public async Task<ChatMsgDto> UpdateAsync(int id, UpdateChatMsgDto updateChatMsgDto)
         {

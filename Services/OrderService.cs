@@ -10,11 +10,13 @@ namespace Tasty_Treat_be.Services
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IMapper _mapper;
+        private readonly INotificationService _notificationService;
 
-        public OrderService(IOrderRepository orderRepository, IMapper mapper)
+        public OrderService(IOrderRepository orderRepository, IMapper mapper, INotificationService notificationService)
         {
             _orderRepository = orderRepository;
             _mapper = mapper;
+            _notificationService = notificationService;
         }
 
         public async Task<OrderDto?> GetByIdAsync(int id)
@@ -45,6 +47,13 @@ namespace Tasty_Treat_be.Services
         {
             var order = _mapper.Map<Order>(createOrderDto);
             var createdOrder = await _orderRepository.AddAsync(order);
+
+            await _notificationService.NotifyRoleAsync(
+                "Admin",
+                "AdminAlert",
+                $"New order #{createdOrder.OrderId} placed — Rs. {createdOrder.TotalAmount:N0}",
+                createdOrder.OrderId);
+
             return _mapper.Map<OrderDto>(createdOrder);
         }
 
@@ -53,6 +62,8 @@ namespace Tasty_Treat_be.Services
             var order = await _orderRepository.GetByIdAsync(id);
             if (order == null)
                 throw new KeyNotFoundException($"Order with id {id} not found");
+
+            var oldStatus = order.Status;
 
             if (!string.IsNullOrEmpty(updateOrderDto.Status))
                 order.Status = updateOrderDto.Status;
@@ -64,6 +75,16 @@ namespace Tasty_Treat_be.Services
                 order.TotalAmount = updateOrderDto.TotalAmount.Value;
 
             var updatedOrder = await _orderRepository.UpdateAsync(order);
+
+            if (!string.IsNullOrEmpty(updateOrderDto.Status) && updateOrderDto.Status != oldStatus)
+            {
+                await _notificationService.NotifyUserAsync(
+                    updatedOrder.CustomerId,
+                    "OrderStatus",
+                    $"Your order #{updatedOrder.OrderId} is now: {updatedOrder.Status}",
+                    updatedOrder.OrderId);
+            }
+
             return _mapper.Map<OrderDto>(updatedOrder);
         }
 
