@@ -83,6 +83,15 @@ namespace Tasty_Treat_be.Services
                     "OrderStatus",
                     $"Your order #{updatedOrder.OrderId} is now: {updatedOrder.Status}",
                     updatedOrder.OrderId);
+
+                if (updatedOrder.Status == "Ready for Delivery")
+                {
+                    await _notificationService.NotifyRoleAsync(
+                        "DeliveryPerson",
+                        "DeliveryUpdate",
+                        $"Order #{updatedOrder.OrderId} is ready for delivery",
+                        updatedOrder.OrderId);
+                }
             }
 
             return _mapper.Map<OrderDto>(updatedOrder);
