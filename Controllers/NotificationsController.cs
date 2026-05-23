@@ -60,6 +60,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpPost("notify-role")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> NotifyRole([FromBody] NotifyRoleDto dto)
         {
             try

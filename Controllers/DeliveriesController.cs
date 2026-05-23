@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Tasty_Treat_be.DTOs;
 using Tasty_Treat_be.Interfaces.Service;
@@ -6,6 +7,7 @@ namespace Tasty_Treat_be.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class DeliveriesController : ControllerBase
     {
         private readonly IDeliveryService _deliveryService;
@@ -16,6 +18,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<DeliveryDto>>> GetAll()
         {
             var deliveries = await _deliveryService.GetAllAsync();
@@ -33,6 +36,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpGet("delivery-person/{deliveryPersonId}")]
+        [Authorize(Roles = "DeliveryPerson,Admin")]
         public async Task<ActionResult<IEnumerable<DeliveryDto>>> GetByDeliveryPersonId(int deliveryPersonId)
         {
             var deliveries = await _deliveryService.GetByDeliveryPersonIdAsync(deliveryPersonId);
@@ -50,6 +54,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<DeliveryDto>> Create([FromBody] CreateDeliveryDto createDeliveryDto)
         {
             try
@@ -64,6 +69,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "DeliveryPerson,Admin")]
         public async Task<ActionResult<DeliveryDto>> Update(int id, [FromBody] UpdateDeliveryDto updateDeliveryDto)
         {
             try
@@ -82,6 +88,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Delete(int id)
         {
             var result = await _deliveryService.DeleteAsync(id);

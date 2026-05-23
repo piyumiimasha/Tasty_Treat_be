@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Tasty_Treat_be.DTOs;
 using Tasty_Treat_be.Interfaces.Service;
@@ -6,6 +7,7 @@ namespace Tasty_Treat_be.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
@@ -20,6 +22,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<OrderDto>>> GetAll()
         {
             var orders = await _orderService.GetAllAsync();
@@ -44,6 +47,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpGet("status/{status}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<OrderDto>>> GetByStatus(string status)
         {
             var orders = await _orderService.GetByStatusAsync(status);
@@ -83,6 +87,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Delete(int id)
         {
             var result = await _orderService.DeleteAsync(id);
@@ -93,6 +98,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpPost("{id}/approve")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Approve(int id)
         {
             try
@@ -119,6 +125,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpPost("{id}/deny")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Deny(int id)
         {
             try

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Tasty_Treat_be.DTOs;
 using Tasty_Treat_be.Interfaces.Service;
@@ -52,6 +53,7 @@ namespace Tasty_Treat_be.Controllers
         /// <param name="image">Optional image file (jpg, png, gif, webp - max 5MB)</param>
         /// <returns>The created item with ImageUrl if image was uploaded</returns>
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ItemDto>> Create([FromForm] CreateItemDto createItemDto, IFormFile? image)
         {
             try
@@ -91,6 +93,7 @@ namespace Tasty_Treat_be.Controllers
         /// <param name="image">Optional new image file (replaces existing image)</param>
         /// <returns>The updated item</returns>
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ItemDto>> Update(int id, [FromForm] UpdateItemDto updateItemDto, IFormFile? image)
         {
             try
@@ -132,6 +135,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Delete(int id)
         {
             var result = await _itemService.DeleteAsync(id);
@@ -142,6 +146,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpPost("{id}/upload-image")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ItemDto>> UploadImage(int id, IFormFile file)
         {
             try
@@ -184,6 +189,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpDelete("{id}/delete-image")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ItemDto>> DeleteImage(int id)
         {
             try

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Tasty_Treat_be.DTOs;
 using Tasty_Treat_be.Interfaces.Service;
@@ -40,6 +41,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpGet("customer/{customerId}")]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<ReviewDto>>> GetByCustomerId(int customerId)
         {
             var reviews = await _reviewService.GetByCustomerIdAsync(customerId);
@@ -47,6 +49,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<ReviewDto>> Create([FromBody] CreateReviewDto createReviewDto)
         {
             try
@@ -61,6 +64,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<ActionResult<ReviewDto>> Update(int id, [FromBody] UpdateReviewDto updateReviewDto)
         {
             try
@@ -79,6 +83,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<ActionResult> Delete(int id)
         {
             var result = await _reviewService.DeleteAsync(id);

@@ -106,7 +106,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]!))
         };
 
-        // Allow SignalR to read the JWT token from the query string
+        // Read JWT from SignalR query string or HttpOnly cookie
         options.Events = new JwtBearerEvents
         {
             OnMessageReceived = context =>
@@ -117,6 +117,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     path.StartsWithSegments("/hubs/notifications"))
                 {
                     context.Token = accessToken;
+                }
+                if (string.IsNullOrEmpty(context.Token))
+                {
+                    context.Token = context.Request.Cookies["authToken"];
                 }
                 return Task.CompletedTask;
             }

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Tasty_Treat_be.DTOs;
 using Tasty_Treat_be.Interfaces.Service;
@@ -6,6 +7,7 @@ namespace Tasty_Treat_be.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class OrderItemsController : ControllerBase
     {
         private readonly IOrderItemService _orderItemService;
@@ -16,6 +18,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<OrderItemDto>>> GetAll()
         {
             var orderItems = await _orderItemService.GetAllAsync();

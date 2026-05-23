@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Tasty_Treat_be.DTOs;
 using Tasty_Treat_be.Interfaces.Service;
@@ -6,6 +7,7 @@ namespace Tasty_Treat_be.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ChatMessagesController : ControllerBase
     {
         private readonly IChatMsgService _chatMsgService;
@@ -16,6 +18,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<ChatMsgDto>>> GetAll()
         {
             var messages = await _chatMsgService.GetAllAsync();
@@ -48,6 +51,7 @@ namespace Tasty_Treat_be.Controllers
 
         // All messages between user {userId} and admin
         [HttpGet("conversation/{userId}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<ChatMsgDto>>> GetConversation(int userId)
         {
             var messages = await _chatMsgService.GetConversationAsync(userId);
@@ -56,6 +60,7 @@ namespace Tasty_Treat_be.Controllers
 
         // Distinct customer list for admin sidebar
         [HttpGet("conversation-users")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<ConversationUserDto>>> GetConversationUsers()
         {
             var users = await _chatMsgService.GetConversationUsersAsync();
@@ -79,6 +84,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpPut("mark-read/{fromUserId}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> MarkRead(int fromUserId)
         {
             await _chatMsgService.MarkMessagesReadAsync(fromUserId);

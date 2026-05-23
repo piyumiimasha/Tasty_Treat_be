@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Tasty_Treat_be.DTOs;
 using Tasty_Treat_be.Interfaces.Service;
@@ -6,6 +7,7 @@ namespace Tasty_Treat_be.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -16,6 +18,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetAll()
         {
             var users = await _userService.GetAllAsync();
@@ -34,6 +37,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpGet("email/{email}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<UserDto>> GetByEmail(string email)
         {
             var user = await _userService.GetByEmailAsync(email);
@@ -44,6 +48,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpGet("role/{role}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetByRole(string role)
         {
             var users = await _userService.GetByRoleAsync(role);
@@ -51,6 +56,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<ActionResult<UserDto>> Create([FromBody] CreateUserDto createUserDto)
         {
             try
@@ -83,6 +89,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Delete(int id)
         {
             var result = await _userService.DeleteAsync(id);
