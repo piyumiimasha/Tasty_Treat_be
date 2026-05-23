@@ -58,6 +58,7 @@ builder.Services.AddScoped<IDeliveryService, DeliveryService>();
 builder.Services.AddScoped<IInstantQuoteService, InstantQuoteService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddSingleton<IPasswordResetService, PasswordResetService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 // Register Notification repository and service
