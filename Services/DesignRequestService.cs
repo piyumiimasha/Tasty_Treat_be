@@ -52,6 +52,13 @@ namespace Tasty_Treat_be.Services
                 CreatedAt = DateTime.UtcNow,
             };
             var created = await _repo.AddAsync(request);
+
+            await _notificationService.NotifyRoleAsync(
+                "Admin",
+                "DesignRequest",
+                $"New custom design request from {dto.CustomerName}.",
+                created.DesignRequestId);
+
             return _mapper.Map<DesignRequestDto>(created);
         }
 
