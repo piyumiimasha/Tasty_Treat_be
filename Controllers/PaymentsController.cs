@@ -9,10 +9,14 @@ namespace Tasty_Treat_be.Controllers
     public class PaymentsController : ControllerBase
     {
         private readonly IPaymentService _paymentService;
+        private readonly IBlobStorageService _blobStorageService;
+        private readonly IConfiguration _configuration;
 
-        public PaymentsController(IPaymentService paymentService)
+        public PaymentsController(IPaymentService paymentService, IBlobStorageService blobStorageService, IConfiguration configuration)
         {
             _paymentService = paymentService;
+            _blobStorageService = blobStorageService;
+            _configuration = configuration;
         }
 
         [HttpGet]
@@ -50,6 +54,29 @@ namespace Tasty_Treat_be.Controllers
                 return NotFound($"Payment with transaction id {transactionId} not found");
 
             return Ok(payment);
+        }
+
+        [HttpPost("upload-slip")]
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult<object>> UploadSlip(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No file provided");
+            if (!file.ContentType.StartsWith("image/"))
+                return BadRequest("Only image files are allowed");
+            if (file.Length > 5 * 1024 * 1024)
+                return BadRequest("File too large (max 5 MB)");
+
+            try
+            {
+                var container = _configuration["AzureBlobStorage:PaymentSlipsContainer"] ?? "paymentslips";
+                var url = await _blobStorageService.UploadImageAsync(file, container);
+                return Ok(new { url });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost]
