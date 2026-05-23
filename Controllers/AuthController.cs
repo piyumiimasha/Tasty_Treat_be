@@ -60,11 +60,13 @@ namespace Tasty_Treat_be.Controllers
         [Authorize]
         public ActionResult Logout()
         {
+            var isDevelopment = HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment();
             Response.Cookies.Delete("authToken", new CookieOptions
             {
                 HttpOnly = true,
-                SameSite = SameSiteMode.Lax,
-                Secure = !HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment(),
+                // SameSite=None required for cross-origin dev setup (http://localhost:3000 → https://localhost:55079)
+                SameSite = isDevelopment ? SameSiteMode.None : SameSiteMode.Lax,
+                Secure = true,
                 Path = "/"
             });
             return NoContent();
@@ -78,8 +80,9 @@ namespace Tasty_Treat_be.Controllers
             Response.Cookies.Append("authToken", token, new CookieOptions
             {
                 HttpOnly = true,
-                SameSite = SameSiteMode.Lax,
-                Secure = !isDevelopment,
+                // SameSite=None required for cross-origin dev setup (http://localhost:3000 → https://localhost:55079)
+                SameSite = isDevelopment ? SameSiteMode.None : SameSiteMode.Lax,
+                Secure = true,
                 Path = "/",
                 Expires = DateTimeOffset.UtcNow.AddMinutes(expiryMinutes)
             });
