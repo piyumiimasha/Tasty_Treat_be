@@ -15,4 +15,12 @@ namespace Tasty_Treat_be.DTOs
     {
         public List<int>? NotificationIds { get; set; }
     }
+
+    public class NotifyRoleDto
+    {
+        public string Role { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
+        public int? ReferenceId { get; set; }
+    }
 }

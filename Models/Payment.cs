@@ -34,6 +34,9 @@ namespace Tasty_Treat_be.Models
         [Column("transaction_date")]
         public DateTime TransactionDate { get; set; } = DateTime.UtcNow;
 
+        [Column("slip_image_url", TypeName = "nvarchar(max)")]
+        public string? SlipImageUrl { get; set; }
+
         // Navigation properties
         [ForeignKey("OrderId")]
         public virtual Order? Order { get; set; }

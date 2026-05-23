@@ -58,5 +58,19 @@ namespace Tasty_Treat_be.Controllers
                 return StatusCode(500, new { message = ex.Message });
             }
         }
+
+        [HttpPost("notify-role")]
+        public async Task<ActionResult> NotifyRole([FromBody] NotifyRoleDto dto)
+        {
+            try
+            {
+                await _notificationService.NotifyRoleAsync(dto.Role, dto.Type, dto.Message, dto.ReferenceId);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
     }
 }

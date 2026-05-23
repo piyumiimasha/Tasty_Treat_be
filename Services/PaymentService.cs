@@ -62,6 +62,8 @@ namespace Tasty_Treat_be.Services
                 payment.Amount = updatePaymentDto.Amount.Value;
             if (!string.IsNullOrEmpty(updatePaymentDto.PaymentStatus))
                 payment.PaymentStatus = updatePaymentDto.PaymentStatus;
+            if (updatePaymentDto.SlipImageUrl != null)
+                payment.SlipImageUrl = updatePaymentDto.SlipImageUrl;
 
             var updatedPayment = await _paymentRepository.UpdateAsync(payment);
             return _mapper.Map<PaymentDto>(updatedPayment);

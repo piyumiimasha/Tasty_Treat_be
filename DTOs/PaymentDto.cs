@@ -9,6 +9,7 @@ namespace Tasty_Treat_be.DTOs
         public decimal Amount { get; set; }
         public string PaymentStatus { get; set; } = string.Empty;
         public DateTime TransactionDate { get; set; }
+        public string? SlipImageUrl { get; set; }
     }
 
     public class CreatePaymentDto
@@ -18,6 +19,7 @@ namespace Tasty_Treat_be.DTOs
         public string PaymentMethod { get; set; } = string.Empty;
         public decimal Amount { get; set; }
         public string PaymentStatus { get; set; } = "Pending";
+        public string? SlipImageUrl { get; set; }
     }
 
     public class UpdatePaymentDto
@@ -26,5 +28,6 @@ namespace Tasty_Treat_be.DTOs
         public string? PaymentMethod { get; set; }
         public decimal? Amount { get; set; }
         public string? PaymentStatus { get; set; }
+        public string? SlipImageUrl { get; set; }
     }
 }
