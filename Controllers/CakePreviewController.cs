@@ -60,44 +60,62 @@ namespace Tasty_Treat_be.Controllers
             var frosting    = Get("frosting");
             var flavour     = Get("flavour", "flavours");
             var topper      = Get("toppers", "topper");
+            var fillings    = GetMany("fillings");
+            var piping      = Get("piping");
             var color       = Get("colors", "color");
             var decorations = GetMany("decorations");
             var dietary     = GetMany("dietary");
 
-            // Any custom types beyond the standard set go into a generic description
+            // Any custom types beyond the ones handled explicitly above fall through
+            // to a generic clause that keeps the type name for context (e.g. a future
+            // "Accents" type with value "Gold" reads as "gold accents").
             var standardTypes = new HashSet<string>
                 { "layers", "shapes", "shape", "frosting", "flavour", "flavours",
-                  "toppers", "topper", "colors", "color", "decorations", "dietary" };
+                  "toppers", "topper", "fillings", "piping",
+                  "colors", "color", "decorations", "dietary" };
             var extras = selected
                 .Where(o => !standardTypes.Contains((o.CustomizationType?.Name ?? "").ToLower()))
-                .Select(o => o.Name)
+                .Select(o => $"{o.Name} {o.CustomizationType?.Name}".Trim().ToLower())
                 .ToList();
 
-            var layerDisplay  = string.IsNullOrEmpty(layers)  ? "1"           : layers;
-            var shapeDisplay  = string.IsNullOrEmpty(shape)   ? "round"       : shape;
-            var frostDisplay  = string.IsNullOrEmpty(frosting) ? "buttercream" : frosting;
-            var flavourDisplay = string.IsNullOrEmpty(flavour) ? "vanilla"     : flavour;
+            // SDXL's CLIP encoder weights early tokens most and truncates around 77
+            // tokens, so the prompt leads with the cake form, then the customer's own
+            // instructions (highest intent), then the selected options, and keeps the
+            // realism cues short so nothing important gets cut off.
+            bool Has(string? v) => !string.IsNullOrWhiteSpace(v) && !v.Trim().Equals("none", StringComparison.OrdinalIgnoreCase);
 
-            var topperStr  = !string.IsNullOrEmpty(topper) && topper.ToLower() != "none"
-                             ? $", decorated with {topper}" : "";
-            var colorStr   = !string.IsNullOrEmpty(color)       ? $", in {color} color theme" : "";
-            var decorStr   = decorations.Length > 0 ? $", with {string.Join(" and ", decorations)} decorations" : "";
-            var dietaryStr = dietary.Length > 0     ? $", {string.Join(" and ", dietary)} friendly" : "";
-            var extraStr   = extras.Count > 0       ? $", {string.Join(", ", extras)}" : "";
-            var instrStr   = !string.IsNullOrEmpty(dto.Instructions) ? $". Additional details: {dto.Instructions}" : "";
+            var sb = new StringBuilder("A ");
+            if (Has(layers)) sb.Append($"{layers.Trim()}-tier ");
+            sb.Append(Has(shape) ? $"{shape.Trim()} cake" : "round cake");
 
-            var prompt =
-                $"A {layerDisplay}-layer {shapeDisplay}-shaped cake with {frostDisplay} frosting and {flavourDisplay} flavour" +
-                $"{topperStr}{colorStr}{decorStr}{dietaryStr}{extraStr}{instrStr}. " +
-                "Simple bakery-style cake, natural imperfections, smooth but not perfect frosting, realistic texture. " +
-                "Placed on a cake board or simple stand, soft natural lighting, minimal shadows, neutral background. " +
-                "Realistic food photography, not stylized, not CGI, not overly glossy.";
+            if (Has(dto.Instructions))
+                sb.Append($", {dto.Instructions!.Trim().TrimEnd('.')}");
+
+            if (Has(frosting)) sb.Append($", covered in {frosting.Trim()} frosting");
+            if (Has(flavour))  sb.Append($", {flavour.Trim()} flavoured");
+            if (fillings.Length > 0)    sb.Append($", filled with {string.Join(" and ", fillings)}");
+            if (Has(color))    sb.Append($", {color.Trim()} color theme");
+            if (decorations.Length > 0) sb.Append($", decorated with {string.Join(" and ", decorations)}");
+            if (Has(piping))   sb.Append($", {piping.Trim()} piping detail");
+            if (Has(topper))   sb.Append($", topped with {topper.Trim()}");
+            if (dietary.Length > 0)     sb.Append($", {string.Join(" and ", dietary)} friendly");
+            if (extras.Count > 0)       sb.Append($", {string.Join(", ", extras)}");
+
+            sb.Append(". Realistic professional bakery cake on a simple stand, ");
+            sb.Append("appetizing food photography, soft natural lighting, neutral background, highly detailed, sharp focus.");
+
+            var prompt = sb.ToString();
+
+            const string negativePrompt =
+                "cartoon, illustration, drawing, painting, sketch, 3d render, cgi, anime, " +
+                "plastic, overly glossy, deformed, distorted, blurry, low quality, grainy, " +
+                "watermark, text, signature, extra cakes, melted, messy, ugly, unappetizing";
 
             var http = _httpClientFactory.CreateClient();
             http.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", _pixazoApiKey);
             http.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
 
-            var body      = JsonSerializer.Serialize(new { prompt });
+            var body      = JsonSerializer.Serialize(new { prompt, negativePrompt });
             var pixazoRes = await http.PostAsync(PIXAZO_URL,
                 new StringContent(body, Encoding.UTF8, "application/json"));
 
