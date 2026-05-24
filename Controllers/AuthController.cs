@@ -69,12 +69,10 @@ namespace Tasty_Treat_be.Controllers
         [Authorize]
         public ActionResult Logout()
         {
-            var isDevelopment = HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment();
             Response.Cookies.Delete("authToken", new CookieOptions
             {
                 HttpOnly = true,
-                // SameSite=None required for cross-origin dev setup (http://localhost:3000 → https://localhost:55079)
-                SameSite = isDevelopment ? SameSiteMode.None : SameSiteMode.Lax,
+                SameSite = SameSiteMode.None,
                 Secure = true,
                 Path = "/"
             });
@@ -118,13 +116,12 @@ namespace Tasty_Treat_be.Controllers
         private void SetAuthCookie(string token)
         {
             var expiryMinutes = int.Parse(_configuration["JwtSettings:ExpiryMinutes"] ?? "60");
-            var isDevelopment = HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment();
 
             Response.Cookies.Append("authToken", token, new CookieOptions
             {
                 HttpOnly = true,
-                // SameSite=None required for cross-origin dev setup (http://localhost:3000 → https://localhost:55079)
-                SameSite = isDevelopment ? SameSiteMode.None : SameSiteMode.Lax,
+                // SameSite=None required: frontend (Vercel) and backend (Azure) are always on different origins
+                SameSite = SameSiteMode.None,
                 Secure = true,
                 Path = "/",
                 Expires = DateTimeOffset.UtcNow.AddMinutes(expiryMinutes)
