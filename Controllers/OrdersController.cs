@@ -47,7 +47,7 @@ namespace Tasty_Treat_be.Controllers
         }
 
         [HttpGet("status/{status}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,DeliveryPerson")]
         public async Task<ActionResult<IEnumerable<OrderDto>>> GetByStatus(string status)
         {
             var orders = await _orderService.GetByStatusAsync(status);
