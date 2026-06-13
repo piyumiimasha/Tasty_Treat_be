@@ -125,7 +125,7 @@ namespace Tasty_Treat_be.Data
                 .HasMany(t => t.CustomizationOptions)
                 .WithOne(o => o.CustomizationType)
                 .HasForeignKey(o => o.TypeId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Configure CustomizationOption → OrderItem relationship
             modelBuilder.Entity<CustomizationOption>()
