@@ -24,5 +24,6 @@ namespace Tasty_Treat_be.DTOs
     {
         public string? Status { get; set; }
         public decimal? QuotedPrice { get; set; }
+        public string? AdminMessage { get; set; }
     }
 }

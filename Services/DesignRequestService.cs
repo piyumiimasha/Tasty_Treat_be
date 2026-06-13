@@ -71,7 +71,7 @@ namespace Tasty_Treat_be.Services
             return _mapper.Map<DesignRequestDto>(updated);
         }
 
-        public async Task<DesignRequestDto> UpdateStatusAsync(int id, string status, decimal? quotedPrice = null)
+        public async Task<DesignRequestDto> UpdateStatusAsync(int id, string status, decimal? quotedPrice = null, string? adminMessage = null)
         {
             var item = await _repo.GetByIdAsync(id);
             if (item == null) throw new KeyNotFoundException($"DesignRequest with id {id} not found");
@@ -93,6 +93,21 @@ namespace Tasty_Treat_be.Services
                         item.CustomerId.Value,
                         "OrderStatus",
                         $"Your custom cake design has been priced at Rs. {item.QuotedPrice:N2}. You can now proceed to checkout!",
+                        id);
+                }
+            }
+            else if (status.Equals("declined", StringComparison.OrdinalIgnoreCase) || status.Equals("cancelled", StringComparison.OrdinalIgnoreCase))
+            {
+                if (item.CustomerId.HasValue)
+                {
+                    var declineMessage = string.IsNullOrWhiteSpace(adminMessage)
+                        ? "Your custom cake design request has been declined."
+                        : $"Your custom cake design request has been declined as: {adminMessage}";
+
+                    await _notificationService.NotifyUserAsync(
+                        item.CustomerId.Value,
+                        "OrderStatus",
+                        declineMessage,
                         id);
                 }
             }

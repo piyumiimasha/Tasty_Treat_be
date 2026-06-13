@@ -85,7 +85,7 @@ namespace Tasty_Treat_be.Controllers
                 if (string.IsNullOrEmpty(dto.Status))
                     return BadRequest("Status is required");
 
-                var request = await _service.UpdateStatusAsync(id, dto.Status, dto.QuotedPrice);
+                var request = await _service.UpdateStatusAsync(id, dto.Status, dto.QuotedPrice, dto.AdminMessage);
                 return Ok(request);
             }
             catch (KeyNotFoundException ex)
