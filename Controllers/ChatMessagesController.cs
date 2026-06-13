@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Tasty_Treat_be.DTOs;
 using Tasty_Treat_be.Interfaces.Service;
 
@@ -51,9 +52,18 @@ namespace Tasty_Treat_be.Controllers
 
         // All messages between user {userId} and admin
         [HttpGet("conversation/{userId}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<ChatMsgDto>>> GetConversation(int userId)
         {
+            var currentUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst("nameid")?.Value;
+
+            if (!User.IsInRole("Admin") &&
+                (!int.TryParse(currentUserIdClaim, out var currentUserId) || currentUserId != userId))
+            {
+                return Forbid();
+            }
+
             var messages = await _chatMsgService.GetConversationAsync(userId);
             return Ok(messages);
         }
